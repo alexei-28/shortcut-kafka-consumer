@@ -6,7 +6,7 @@ server:
 app:
   kafka:
     topics:
-      message: message_topic
+      message: message-topic
     groups:
       message: message-consumer-group
 spring:

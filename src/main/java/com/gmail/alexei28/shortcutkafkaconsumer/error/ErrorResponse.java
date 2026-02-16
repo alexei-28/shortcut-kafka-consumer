@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.dto;
+package com.gmail.alexei28.shortcutkafkaconsumer.error;
 
 public class ErrorResponse {
   private String message;

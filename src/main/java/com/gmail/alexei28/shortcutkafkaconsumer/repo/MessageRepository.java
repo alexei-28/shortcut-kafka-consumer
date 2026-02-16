@@ -1,6 +1,6 @@
 package com.gmail.alexei28.shortcutkafkaconsumer.repo;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.dto.Message;
+import com.gmail.alexei28.shortcutkafkaconsumer.entity.Message;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

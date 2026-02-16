@@ -2,13 +2,18 @@ package com.gmail.alexei28.shortcutkafkaconsumer.consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.ArgumentMatchers.*;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.dto.Message;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gmail.alexei28.shortcutkafkaconsumer.entity.Message;
 import com.gmail.alexei28.shortcutkafkaconsumer.repo.MessageRepository;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,9 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.util.StreamUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -48,27 +55,42 @@ class MessageIntegrationTest {
       new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"));
 
   @Autowired private MessageRepository repository; // Directly check the DB
-  private Message consumedMessage;
   private String consumedMessageContent;
-  @Autowired private KafkaTemplate<String, Message> kafkaTemplate;
+  @Autowired private KafkaTemplate<String, String> kafkaTemplate;
+  @Autowired private ObjectMapper objectMapper;
   // Поскольку MessageConsumer помечен как @MockitoSpyBean, Spring использует реальный экземпляр,
   // но позволяет нам «подсматривать» за его методами через verify.
   @MockitoSpyBean private MessageConsumer messageConsumerMock;
-
+  private long randomNumber;
+  private static String jsonTemplate;
+  private String consumedValidJson;
   private static final Logger logger = LoggerFactory.getLogger(MessageIntegrationTest.class);
+
+  @BeforeAll
+  static void beforeAll() throws IOException {
+    jsonTemplate =
+        StreamUtils.copyToString(
+            new ClassPathResource("message_template.json").getInputStream(),
+            StandardCharsets.UTF_8);
+  }
 
   @BeforeEach
   void setUp() {
-    consumedMessageContent = "Message_Test_".concat(String.valueOf(System.currentTimeMillis()));
-    consumedMessage =
-        new Message(System.currentTimeMillis(), consumedMessageContent, LocalDateTime.now());
+    randomNumber = new Random().nextLong(10000);
+    consumedMessageContent = "Message_TEST_CONSUMED_" + randomNumber;
+    // Update specific nodes in the JSON
+    DocumentContext context =
+        JsonPath.parse(jsonTemplate)
+            .set("$.number", randomNumber)
+            .set("$.content", consumedMessageContent);
+    consumedValidJson = context.jsonString();
   }
 
   @Test
   @DisplayName("Should consume and save message to repo")
   void shouldConsumeAndSaveMessageToRepo() {
     // Act
-    kafkaTemplate.send(topic, consumedMessage);
+    kafkaTemplate.send(topic, consumedValidJson);
 
     // Assert
     // Use Awaitility because Kafka consumption is asynchronous
@@ -76,9 +98,9 @@ class MessageIntegrationTest {
         .atMost(Duration.ofSeconds(10))
         .untilAsserted(
             () -> {
-              Optional<Message> actualMessage = repository.findById(1L);
-              assertThat(actualMessage).isPresent();
-              assertThat(actualMessage.get().getContent()).isEqualTo(consumedMessageContent);
+              Optional<Message> actualMessageContent = repository.findByNumber(randomNumber);
+              assertThat(actualMessageContent).isPresent();
+              assertThat(actualMessageContent.get().getContent()).isEqualTo(consumedMessageContent);
             });
   }
 }
