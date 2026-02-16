@@ -1,0 +1,20 @@
+repos:
+  # Проверка кода через Gradle + Spotless
+  - repo: local
+    hooks:
+      - id: spotless
+        name: spotless formatter
+        entry: ./gradlew spotlessApply
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # Conventional commits - https://www.conventionalcommits.org
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: []
+        # Можно настроить свои типы
+        # args: [feat, fix, chore, refactor, test, docs]
