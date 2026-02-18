@@ -5,6 +5,10 @@
 
 :BASE_URL = http://localhost:8081/api/v1
 
+
+# Spring Boot actuator
+GET :BASE_URL/actuator/health
+
 ## Hello page
 GET :BASE_URL/hello
 

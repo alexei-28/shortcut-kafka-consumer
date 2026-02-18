@@ -24,13 +24,20 @@ repositories {
     mavenCentral()
 }
 
+val mapstructVersion = "1.6.3"
+val equalsverifierVersion = "4.3.1"
+
 dependencies {
+    annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     implementation("org.springframework.boot:spring-boot-starter-web")
 
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.apache.kafka:kafka-clients")
+    implementation("org.mapstruct:mapstruct:$mapstructVersion")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -39,6 +46,7 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    testImplementation("nl.jqno.equalsverifier:equalsverifier:$equalsverifierVersion")
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
