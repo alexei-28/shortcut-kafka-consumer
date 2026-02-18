@@ -1,6 +1,5 @@
 package com.gmail.alexei28.shortcutkafkaconsumer.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,31 +7,18 @@ import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/*
-   Чтобы Spring смог «собрать» объект из JSON, ваш класс Message должен соответствовать двум правилам:
-   - Конструктор по умолчанию: Jackson сначала создает «пустой» объект через конструктор без аргументов, а затем заполняет его данными.
-   - Геттеры и Сеттеры: Либо поля должны быть публичными (что плохо), либо у вас должны быть стандартные
-     get/set методы (или аннотации Lombok @Data/@Getter+@Setter).
-*/
 @Entity
-public class Message {
+public class Task1 {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @JsonIgnore
   private Long id;
 
   private Long number;
   private String content;
   private LocalDateTime receivedAt;
 
-  public Message() {
+  public Task1() {
     // JPA requires a no-args constructor
-  }
-
-  public Message(long number, String content, LocalDateTime receivedAt) {
-    this.number = number;
-    this.content = content;
-    this.receivedAt = receivedAt;
   }
 
   // --- Getters and Setters ---
@@ -70,19 +56,19 @@ public class Message {
   @Override
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) return false;
-    Message message = (Message) o;
-    return Objects.equals(number, message.number);
+    Task1 task1 = (Task1) o;
+    return Objects.equals(id, task1.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(number);
+    return Objects.hashCode(id);
   }
 
   @Override
   public String toString() {
-    return "Message{"
-        + "id ="
+    return "Task1 {"
+        + "id = "
         + id
         + ", number = "
         + number
