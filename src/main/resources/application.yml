@@ -6,9 +6,9 @@ server:
 app:
   kafka:
     topics:
-      task1: task1-topic
+      task2: task2-topic
     groups:
-      task1: task1-group
+      task2: task2-group
 spring:
   application:
     name: shortcut-kafka-consumer
@@ -58,7 +58,7 @@ spring:
       properties:
         # Запрещаем удалять заголовки типов после десериализации
         spring.json.remove.type.headers: false
-        spring.json.type.mapping: "com.gmail.alexei28.shortcutkafkaproducer.dto.Task1Dto:com.gmail.alexei28.shortcutkafkaconsumer.dto.Task1Dto"
+        spring.json.type.mapping: "com.gmail.alexei28.shortcutkafkaproducer.task2.dto.Task2Dto:com.gmail.alexei28.shortcutkafkaconsumer.task2.dto.Task1Dto"
         # 2. Указываем делегатов, которые будут выполнять реальную работу
         spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
