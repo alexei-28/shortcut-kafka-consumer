@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-// Validate is application is up: e.g. http://localhost:8082/api/v1/actuator/health
 @SpringBootApplication
 public class Main {
   private static final Logger logger = LoggerFactory.getLogger(Main.class);

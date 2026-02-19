@@ -26,7 +26,7 @@ Mentor platform - Shortcut: https://shortcut.education/
 * **Install application environment**
   * docker-compose -f postgresql-docker-compose.yml up -d
   * Run application: ./gradlew bootRun
-  * Validate is application is running: http://localhost:8081/api/v1/hello
+  * Validate is application is up:  http://localhost:8082/api/v1/actuator/health
 
 ---
 # Kafka — практические задачи
