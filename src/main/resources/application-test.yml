@@ -2,9 +2,7 @@
 app:
   kafka:
     topics:
-      message: test_message_topic
-    groups:
-      message: test-message-consumer-group
+      task1: test-task1-topic
 spring:
   jpa:
     hibernate:
@@ -12,26 +10,18 @@ spring:
       #ddl-auto: update
   # Comment because use @Testcontainers for Kafka and Postgres
   #datasource:
-  #  url: jdbc:postgresql://localhost:5433/docker_kafka_consumer_db
+  #  url: jdbc:postgresql://localhost:5433/docker_kafka_producer_db
   #  driver-class-name: org.postgresql.Driver
   #  username: postgres
   #  password: postgres
   kafka:
     bootstrap-servers: localhost:9092
-    topic-name: test_topic
+    topic-name: test-topic
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
-      group-id: test-group
-      # Эквивалент ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
-      auto-offset-reset: earliest
-      # Эквивалент ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
-      # 1. Указываем ErrorHandlingDeserializer как основной класс
-      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        # 2. Указываем делегатов, которые будут выполнять реальную работу
-        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-        spring.json.trusted.packages: "*" # Доверяем всем пакетам для десериализации
+        spring.json.trusted.packages: "*"

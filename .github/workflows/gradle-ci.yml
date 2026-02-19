@@ -1,0 +1,53 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches:
+      - main # Trigger the workflow on pushes to the 'main' branch
+      - develop # You can add other branches you want to monitor, e.g., 'develop'
+  pull_request:
+    branches:
+      - main
+      - develop # Trigger on pull requests targeting 'main' or 'develop'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # Specify the operating system for the job (GitHub-hosted runner)
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # This action clones your repository onto the runner.
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4 # This action sets up the specified Java Development Kit.
+        with:
+          java-version: '8' # **IMPORTANT:** Specify the Java version your project uses (e.g., '8', '11', '17', '21').
+          distribution: 'temurin' # Recommended: Use Temurin (Eclipse Adoptium) distribution.
+
+      - name: Set up Gradle Wrapper Permissions
+        run: chmod +x gradlew # Ensure the gradlew script is executable.
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4 # This action caches Gradle dependencies to speed up subsequent builds.
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build with Gradle and run tests
+        run: ./gradlew build # Executes the 'build' task of your Gradle project. This typically compiles code, runs tests, and packages artifacts.
+
+      # Optional: Upload build artifacts (e.g., JAR/WAR files)
+      # This is useful if you want to use these artifacts in subsequent CD steps or for inspection.
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-gradle-app # Name for your artifact
+          path: build/libs/*.jar # Path to your compiled JAR file(s). Adjust if you have a WAR (build/libs/*.war) or multiple JARs.
+          # If you have a multi-module project and want to upload all:
+          # path: |
+          #   **/build/libs/*.jar
+          #   **/build/libs/*.war
