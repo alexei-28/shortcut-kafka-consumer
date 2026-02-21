@@ -52,13 +52,15 @@ spring:
       group-id: dev-group
       # Эквивалент ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
       auto-offset-reset: earliest
+      #Отключаем авто-коммит, чтобы мы сами управляли процессом
+      enable-auto-commit: false
       # 1. Указываем ErrorHandlingDeserializer как основной класс
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
         # Запрещаем удалять заголовки типов после десериализации
         spring.json.remove.type.headers: false
-        spring.json.type.mapping: "com.gmail.alexei28.shortcutkafkaproducer.dto.Task1Dto:com.gmail.alexei28.shortcutkafkaconsumer.dto.Task1Dto"
+        spring.json.type.mapping: "com.gmail.alexei28.shortcutkafkaproducer.task1.dto.Task1Dto:com.gmail.alexei28.shortcutkafkaconsumer.task1.dto.Task1Dto"
         # 2. Указываем делегатов, которые будут выполнять реальную работу
         spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
