@@ -2,9 +2,17 @@
 # More examples: https://github.com/pashky/restclient.el/blob/master/examples/httpbin
 # C-c C-v: same as C-c C-c, but doesn't switch focus to other window
 # C-c C-u: copy query under the cursor as a curl command
+# C-h e (view-echo-area-messages): print request header and body
 
-:BASE_URL = http://localhost:8081/api/v1
+# Some generic vars
+:BASE_URL = http://localhost:8082/api/v1
 
 # Spring Boot actuator
 GET :BASE_URL/actuator/health
+
+############################# Task 4 #############################
+
+# Retry send message from DLQ
+POST :BASE_URL/dlt/retry/1ebef307-4a2e-40d9-aa02-1f3e71d691dc
+
 
