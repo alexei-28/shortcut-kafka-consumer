@@ -1,5 +1,7 @@
 package com.gmail.alexei28.shortcutkafkaconsumer.configuration;
 
+import com.gmail.alexei28.shortcutkafkaconsumer.task4.dto.UserDto;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 
@@ -11,13 +13,10 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 */
 @Configuration
 public class AppConfiguration {
-  private final KafkaLoggingConsumerListener kafkaLoggingConsumerListener;
 
-  // Spring Boot автоматически создает эту фабрику, мы просто её настраиваем
   public AppConfiguration(
-      KafkaLoggingConsumerListener kafkaLoggingConsumerListener,
-      ConcurrentKafkaListenerContainerFactory<Object, Object> factory) {
-    this.kafkaLoggingConsumerListener = kafkaLoggingConsumerListener;
-    factory.setRecordInterceptor(kafkaLoggingConsumerListener);
+      KafkaLoggingConsumerListener<String, UserDto> kafkaLoggingConsumerListenerUserDto,
+      @Qualifier("kafkaListenerContainerFactory") ConcurrentKafkaListenerContainerFactory<String, UserDto> factory) {
+    factory.setRecordInterceptor(kafkaLoggingConsumerListenerUserDto);
   }
 }

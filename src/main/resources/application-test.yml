@@ -2,7 +2,9 @@
 app:
   kafka:
     topics:
-      task1: test-task1-topic
+      task4: test-task4-topic
+    groups:
+      task4: test-task4-group
 spring:
   jpa:
     hibernate:
