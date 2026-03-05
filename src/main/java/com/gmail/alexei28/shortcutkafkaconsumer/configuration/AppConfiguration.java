@@ -1,6 +1,6 @@
 package com.gmail.alexei28.shortcutkafkaconsumer.configuration;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.task4.dto.UserDto;
+import com.gmail.alexei28.shortcutkafkaconsumer.task5.dto.UserDto;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;

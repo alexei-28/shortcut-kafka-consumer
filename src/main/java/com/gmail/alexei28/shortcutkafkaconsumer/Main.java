@@ -5,8 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 public class Main {
   private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
@@ -15,7 +17,7 @@ public class Main {
     app.addListeners(new VersionInfoListener());
     app.run(args);
 
-    logger.info("Application started successfully!");
+    logger.info("\n\n ===== Application started successfully! =====\nЗадача 5 - DLQ, но удобнее");
     logger.info(
         "Java version: {}, Java vendor: {}",
         System.getProperty("java.version"),
