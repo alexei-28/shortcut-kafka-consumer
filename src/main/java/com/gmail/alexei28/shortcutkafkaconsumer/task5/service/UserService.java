@@ -1,9 +1,9 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task4.service;
+package com.gmail.alexei28.shortcutkafkaconsumer.task5.service;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.task4.dto.UserDto;
-import com.gmail.alexei28.shortcutkafkaconsumer.task4.entity.User;
-import com.gmail.alexei28.shortcutkafkaconsumer.task4.interfaces.UserMapper;
-import com.gmail.alexei28.shortcutkafkaconsumer.task4.repo.UserRepository;
+import com.gmail.alexei28.shortcutkafkaconsumer.task5.dto.UserDto;
+import com.gmail.alexei28.shortcutkafkaconsumer.task5.entity.User;
+import com.gmail.alexei28.shortcutkafkaconsumer.task5.interfaces.UserMapper;
+import com.gmail.alexei28.shortcutkafkaconsumer.task5.repo.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -33,35 +33,36 @@ public class UserService {
   private static final Pattern INN_PATTERN = Pattern.compile("^\\d{1,20}$");
   private final UserRepository userRepository;
   private final UserMapper userMapper;
-  private final DltService dltService;
+  private final DlqMessageUpdater dlqMessageUpdater;
+
   private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-  public UserService(UserRepository userRepository, UserMapper userMapper, DltService dltService) {
+  public UserService(
+      UserRepository userRepository, UserMapper userMapper, DlqMessageUpdater dlqMessageUpdater) {
     this.userRepository = userRepository;
     this.userMapper = userMapper;
-    this.dltService = dltService;
+    this.dlqMessageUpdater = dlqMessageUpdater;
   }
 
   @Transactional
-  public void saveUser(UserDto userDto) {
+  public void saveUser(UserDto userDto, String eventId) {
     validate(userDto);
-    String eventId = userDto.getEventId().toString();
     // Idempotency защита
     if (userRepository.existsByEventId(eventId)) {
       logger.warn("saveUser, Duplicate eventId detected: {}", eventId);
       return;
     }
-    User user = userMapper.toEntity(userDto);
+    User user = userMapper.toEntity(userDto, eventId);
     userRepository.save(user);
     logger.info("saveUser, successfully saved to repo, user: {}", user);
     // Удаление из DLT ТОЛЬКО после успешного сохранения
-    dltService.deleteIfExists(eventId);
+    dlqMessageUpdater.deleteIfExists(eventId);
     logger.info("saveUser, deleted from DLT if existed, eventId: {}", eventId);
   }
 
   /*
-    Если валидация не прошла, то отправляет сообщение в DLQ, благодаря
-    KafkaConsumerConfig#errorHandler.addNotRetryableExceptions(IllegalArgumentException.class).
+    Если валидация не прошла, то отправляем сообщение в БД (таблица task5_dlt_messages).
+    Смотри KafkaConsumerConfig#errorHandler
   */
   private void validate(UserDto userDto) {
     String email = userDto.getEmail();

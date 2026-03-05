@@ -1,7 +1,7 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task4.interfaces;
+package com.gmail.alexei28.shortcutkafkaconsumer.task5.interfaces;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.task4.dto.UserDto;
-import com.gmail.alexei28.shortcutkafkaconsumer.task4.entity.User;
+import com.gmail.alexei28.shortcutkafkaconsumer.task5.dto.UserDto;
+import com.gmail.alexei28.shortcutkafkaconsumer.task5.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -9,8 +9,9 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
   @Mapping(target = "id", ignore = true)
+  @Mapping(target = "eventId", source = "key")
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
-  User toEntity(UserDto dto);
+  User toEntity(UserDto dto, String key);
 }

@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task4.entity;
+package com.gmail.alexei28.shortcutkafkaconsumer.task5.entity;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Entity
 @Table(
-    name = "task4_users",
+    name = "task5_users",
     uniqueConstraints = {
       @UniqueConstraint(name = "uk_user_event_id", columnNames = "event_id"),
       @UniqueConstraint(name = "uk_user_user_id", columnNames = "user_id")

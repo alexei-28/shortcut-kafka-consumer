@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task4.dto;
+package com.gmail.alexei28.shortcutkafkaconsumer.task5.dto;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;

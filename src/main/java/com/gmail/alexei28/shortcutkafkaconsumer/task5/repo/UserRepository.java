@@ -1,6 +1,6 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task4.repo;
+package com.gmail.alexei28.shortcutkafkaconsumer.task5.repo;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.task4.entity.User;
+import com.gmail.alexei28.shortcutkafkaconsumer.task5.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,18 +1,19 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task4.entity;
+package com.gmail.alexei28.shortcutkafkaconsumer.task5.entity;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "task4_dlt_messages")
-public class DltMessage {
+@Table(name = "task5_dlq_messages")
+public class DlqMessage {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(unique = true)
-  private String messageKey;
+  //  idempotency key
+  @Column(name = "event_id", nullable = false, unique = true)
+  private String eventId;
 
   @Column(columnDefinition = "TEXT")
   private String payload;
@@ -24,7 +25,9 @@ public class DltMessage {
   private Long offsetValue;
 
   @Enumerated(EnumType.STRING)
-  private DltStatus status;
+  private DlqStatus status;
+
+  private Integer retryCount = 0;
 
   private OffsetDateTime createdAt;
 
@@ -38,7 +41,8 @@ public class DltMessage {
   @PrePersist
   public void prePersist() {
     createdAt = OffsetDateTime.now();
-    status = DltStatus.NEW;
+    updatedAt = OffsetDateTime.now();
+    status = DlqStatus.NEW;
   }
 
   @PreUpdate
@@ -46,11 +50,11 @@ public class DltMessage {
     updatedAt = OffsetDateTime.now(); // Авто-обновление при любом изменении
   }
 
-  public DltMessage() {}
+  public DlqMessage() {}
 
-  public DltMessage(
-      String messageKey, String payload, String topic, Integer partitionNumber, Long offsetValue) {
-    this.messageKey = messageKey;
+  public DlqMessage(
+      String eventId, String payload, String topic, Integer partitionNumber, Long offsetValue) {
+    this.eventId = eventId;
     this.payload = payload;
     this.topic = topic;
     this.partitionNumber = partitionNumber;
@@ -65,12 +69,12 @@ public class DltMessage {
     this.id = id;
   }
 
-  public String getMessageKey() {
-    return messageKey;
+  public String getEventId() {
+    return eventId;
   }
 
-  public void setMessageKey(String messageKey) {
-    this.messageKey = messageKey;
+  public void setEventId(String eventId) {
+    this.eventId = eventId;
   }
 
   public String getPayload() {
@@ -105,20 +109,24 @@ public class DltMessage {
     this.offsetValue = offsetValue;
   }
 
-  public DltStatus getStatus() {
+  public DlqStatus getStatus() {
     return status;
   }
 
-  public void setStatus(DltStatus status) {
+  public void setStatus(DlqStatus status) {
     this.status = status;
+  }
+
+  public Integer getRetryCount() {
+    return retryCount;
+  }
+
+  public void setRetryCount(Integer retryCount) {
+    this.retryCount = retryCount;
   }
 
   public OffsetDateTime getCreatedAt() {
     return createdAt;
-  }
-
-  public void setCreatedAt(OffsetDateTime createdAt) {
-    this.createdAt = createdAt;
   }
 
   public String getErrorMessage() {
@@ -141,17 +149,13 @@ public class DltMessage {
     return updatedAt;
   }
 
-  public void setUpdatedAt(OffsetDateTime updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
   @Override
   public String toString() {
-    return "DltMessage{"
+    return "\nDltMessage{"
         + "id="
         + id
-        + ", messageKey='"
-        + messageKey
+        + ", eventId='"
+        + eventId
         + '\''
         + ", payload='"
         + payload
@@ -165,6 +169,8 @@ public class DltMessage {
         + offsetValue
         + ", status="
         + status
+        + ", retryCount="
+        + retryCount
         + ", createdAt="
         + createdAt
         + ", updatedAt="

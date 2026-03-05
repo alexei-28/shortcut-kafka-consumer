@@ -12,9 +12,14 @@ management:
 app:
   kafka:
     topics:
-      task4: task4-topic
+      task5: task5-topic
     groups:
-      task4: task4-group
+      task5: task5-group
+    retry:
+      # Частота запуска планировщика для повторной обработки сообщений из таблицы task5_dlq_messages.
+      rate-ms: 60000
+      # Максимальное количество попыток для транзиентных(временных) ошибок - недоступна Kafka,сеть,БД и т.д.
+      max-attempts: 3
 spring:
   application:
     name: shortcut-kafka-consumer
@@ -66,8 +71,9 @@ spring:
       # Consumer не падает. При ошибке десериализации отправляет сообщение в DLQ
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-        spring.json.value.default.type: "com.gmail.alexei28.shortcutkafkaconsumer.task4.dto.UserDto"
+        spring.json.value.default.type: "com.gmail.alexei28.shortcutkafkaconsumer.task5.dto.UserDto"
         spring.json.trusted.packages: "*"
         spring.json.remove.type.headers: false
 logging.level:

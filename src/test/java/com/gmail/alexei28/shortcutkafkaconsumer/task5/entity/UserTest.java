@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task4.entity;
+package com.gmail.alexei28.shortcutkafkaconsumer.task5.entity;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
