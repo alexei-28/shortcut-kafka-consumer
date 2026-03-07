@@ -2,7 +2,12 @@
 app:
   kafka:
     topics:
-      task1: test-task1-topic
+      task5: test-task5-topic
+    groups:
+      task5: test-task5-group
+    retry:
+      # Максимальное количество попыток для транзиентных(временных) ошибок - недоступна Kafka,сеть,БД и т.д.
+      max-attempts: 3
 spring:
   jpa:
     hibernate:

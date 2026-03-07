@@ -3,12 +3,23 @@ server:
   port: 8082
   servlet:
     context-path: /api/v1/
+management:
+  # http://localhost:8082/api/v1/actuator/mappings
+  endpoints:
+    web:
+      exposure:
+        include: mappings
 app:
   kafka:
     topics:
-      task1: task1-topic
+      task5: task5-topic
     groups:
-      task1: task1-group
+      task5: task5-group
+    retry:
+      # Частота запуска планировщика для повторной обработки сообщений из таблицы task5_dlq_messages.
+      rate-ms: 60000
+      # Максимальное количество попыток для транзиентных(временных) ошибок - недоступна Kafka,сеть,БД и т.д.
+      max-attempts: 3
 spring:
   application:
     name: shortcut-kafka-consumer
@@ -48,24 +59,28 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     topic-name: dev-topic
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true # Важно для корректного восстановления из DLQ
     consumer:
-      group-id: dev-group
-      # Эквивалент ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
-      auto-offset-reset: earliest
-      # 1. Указываем ErrorHandlingDeserializer как основной класс
-      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      # Для ключа используем обычный StringDeserializer, так как там редко бывают ошибки
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # ErrorHandlingDeserializer решает classic Kafka problem: broken JSON
+      # Consumer не падает. При ошибке десериализации отправляет сообщение в DLQ
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        # Запрещаем удалять заголовки типов после десериализации
-        spring.json.remove.type.headers: false
-        spring.json.type.mapping: "com.gmail.alexei28.shortcutkafkaproducer.dto.Task1Dto:com.gmail.alexei28.shortcutkafkaconsumer.dto.Task1Dto"
-        # 2. Указываем делегатов, которые будут выполнять реальную работу
         spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-        spring.json.trusted.packages: "*" # Доверяем всем пакетам для десериализации
-    listener:
-      ack-mode: MANUAL_IMMEDIATE
+        spring.json.value.default.type: "com.gmail.alexei28.shortcutkafkaconsumer.task5.dto.UserDto"
+        spring.json.trusted.packages: "*"
+        spring.json.remove.type.headers: false
 logging.level:
-  org.springframework.kafka: info
   org.hibernate.SQL: debug
   org.hibernate.orm.jdbc.bind: trace
+  org.springframework.kafka: info
+  # Именно этот логгер покажет ошибку десериализации
+  org.springframework.kafka.support.serializer: DEBUG
+  # Этот логгер покажет процесс работы ErrorHandler и Recoverer
+  org.springframework.kafka.listener.DeadLetterPublishingRecoverer: DEBUG

@@ -2,9 +2,48 @@
 # More examples: https://github.com/pashky/restclient.el/blob/master/examples/httpbin
 # C-c C-v: same as C-c C-c, but doesn't switch focus to other window
 # C-c C-u: copy query under the cursor as a curl command
+# C-h e (view-echo-area-messages): print request header and body
 
-:BASE_URL = http://localhost:8081/api/v1
+# Some generic vars
+:BASE_URL = http://localhost:8082/api/v1
 
 # Spring Boot actuator
 GET :BASE_URL/actuator/health
 
+############################# Task 4 #############################
+
+# Get list of all DLT messages
+GET :BASE_URL/dlt/list
+
+# Get list of all DLT messages filter by topic
+GET :BASE_URL/dlt/list?topic=task5-topic
+
+# Get list of all DLT messages filter by status: NEW
+GET :BASE_URL/dlt/list?status=NEW
+
+# Get list of all DLT messages filter by status NEW, FAILED
+GET :BASE_URL/dlt/list?status=NEW&status=FAILED
+
+# Get list of all DLT messages filter by topic and status NEW
+GET :BASE_URL/dlt/list?topic=task5-topic&status=NEW
+
+# Get list of all DLT messages filter by from
+GET :BASE_URL/dlt/list?from=2026-03-01T09:20:00Z
+
+# Get list of all DLT messages filter by from and to
+GET :BASE_URL/dlt/list?from=2026-03-05T21:41:17Z&to=2026-03-05T21:41:44Z
+
+# Retry all DLT messages
+POST :BASE_URL/dlt/retry
+
+# Retry DLT messages filter by topic
+POST :BASE_URL/dlt/retry?topic=task5-topic
+
+# Retry DLT messages filter by status RETRIED
+POST :BASE_URL/dlt/retry?status=RETRIED
+
+# Update DLT message by status IGNORED
+POST :BASE_URL/dlt/ignore/dcd1dbff-13bf-4b6f-821e-559a173d7124d
+
+# Retry send message from DLQ
+POST :BASE_URL/dlt/retry/1dc41f6e-1261-4224-b77c-56bf1ab9afdf
