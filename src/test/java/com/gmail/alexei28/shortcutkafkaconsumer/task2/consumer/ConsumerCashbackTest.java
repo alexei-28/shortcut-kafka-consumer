@@ -33,6 +33,8 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.util.StreamUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -75,11 +77,20 @@ class ConsumerCashbackTest {
   static PostgreSQLContainer<?> postgresContainer =
       new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"));
 
+  // overrideProps вызывается один раз при создании Spring ApplicationContext.
+  // Все тесты класса будут работать с одной уникальной группой.
+  @DynamicPropertySource
+  static void overrideProps(DynamicPropertyRegistry registry) {
+    // Берем префикс из проперти
+    String prefix = "test-task2-group";
+    registry.add("app.kafka.groups.task2", () -> prefix + "-" + UUID.randomUUID());
+  }
+
   /*
       Поскольку CashbackRepository помечен как @MockitoSpyBean, Spring использует реальный экземпляр,
       но позволяет нам «подсматривать» за его методами через verify.
-      @MockitoSpyBean: Позволяет нам следить за реальным бином ConsumerTask1 и считать количествовызовов метода consume.
-      Spring создает настоящий экземпляр вашего ConsumerTask1 со всеми его зависимостями (repository, taskMapper).
+      @MockitoSpyBean: Позволяет нам следить за реальным бином CashbackRepository и считать количество вызовов метода consume.
+      Spring создает настоящий экземпляр вашего CashbackRepository со всеми его зависимостями (repository, taskMapper).
       Обертка (Spy): Mockito «оборачивает» этот реальный объект.
       Это позволяет вам:
       -Вызывать реальные методы (код внутри consume и process будет выполнен).
@@ -126,7 +137,7 @@ class ConsumerCashbackTest {
   }
 
   /*
-      Позитивный сценарий:
+      Позитивный сценарий - happy path (сообщение → обработка → запись в БД):
         1. ConsumerCashback.consume() вызывается
         2. запись сохраняется в Postgres
         3. вызывается ack.acknowledge()
@@ -149,13 +160,13 @@ class ConsumerCashbackTest {
 
     // Assert
     // Ждём пока отработает метод consume
-
     await()
         .atMost(15, SECONDS)
         .untilAsserted( // повторяет assert/verify, пока не пройдет
             () ->
                 verify(consumerCashbackSpy, times(1))
-                    .consume(any(CashbackDto.class), any(Acknowledgment.class)));
+                    .consume(
+                        any(), any(), any(), any(CashbackDto.class), any(Acknowledgment.class)));
 
     // Если ack.acknowledge() был вызван -> Kafka снова Не пришлет сообщение, поэтому проверяем что
     // запись в БД только 1
@@ -172,7 +183,7 @@ class ConsumerCashbackTest {
   }
 
   /*
-    Негативный сценарий:
+    Негативный сценарий - поведение при повторной доставке:
     Мы должны искусственно уронить сохранение в БД(e,g, DataAccessResourceFailureException), но при этом:
       - Kafka listener продолжит жить
       - offset не зафиксируется (метод ack.acknowledge() не будет вызван)
@@ -202,7 +213,8 @@ class ConsumerCashbackTest {
         .untilAsserted( // повторяет assert/verify, пока не пройдет
             () ->
                 verify(consumerCashbackSpy, times(1))
-                    .consume(any(CashbackDto.class), any(Acknowledgment.class)));
+                    .consume(
+                        any(), any(), any(), any(CashbackDto.class), any(Acknowledgment.class)));
 
     // Если ack НЕ был вызван -> Kafka пришлёт сообщение снова
     await()
@@ -212,7 +224,7 @@ class ConsumerCashbackTest {
             () -> {
               // consume должен вызваться более одного раза
               verify(consumerCashbackSpy, atLeast(2))
-                  .consume(any(CashbackDto.class), any(Acknowledgment.class));
+                  .consume(any(), any(), any(), any(CashbackDto.class), any(Acknowledgment.class));
             });
 
     // Убеждаемся, что в БД ничего не сохранилось
@@ -256,7 +268,8 @@ class ConsumerCashbackTest {
         .untilAsserted(
             () -> // повторяет assert/verify, пока не пройдет
             verify(consumerCashbackSpy, times(1))
-                    .consume(any(CashbackDto.class), any(Acknowledgment.class)));
+                    .consume(
+                        any(), any(), any(), any(CashbackDto.class), any(Acknowledgment.class)));
 
     // Проверяем, что запись в БД только 1
     long firstCount = cashbackRepositorySpy.count();
@@ -280,7 +293,8 @@ class ConsumerCashbackTest {
         .untilAsserted(
             () -> // повторяет assert/verify, пока не пройдет
             verify(consumerCashbackSpy, atLeast(2))
-                    .consume(any(CashbackDto.class), any(Acknowledgment.class)));
+                    .consume(
+                        any(), any(), any(), any(CashbackDto.class), any(Acknowledgment.class)));
 
     // НЕТ повторных доставок (ACK был!).
     // Если ack не вызвать -> Kafka будет бесконечно ретраить.

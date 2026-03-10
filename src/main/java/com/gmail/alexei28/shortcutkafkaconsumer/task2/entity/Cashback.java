@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Entity
 @Table(
-    name = "cashbacks",
+    name = "task2_cashbacks",
     uniqueConstraints = @UniqueConstraint(name = "uk_cashback_event_id", columnNames = "event_id"))
 public class Cashback {
 

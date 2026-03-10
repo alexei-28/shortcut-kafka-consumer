@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -135,17 +137,27 @@ public class ConsumerCashback {
   }
 
   /*
-   Steps:
-   1. Получили Kafka message
-   2. Проверили есть ли eventId в БД (База гарантирует атомарность)
-   3. Если есть -> ACK и игнор
-   4. Если нет -> сохранить + ACK
+    Steps:
+       1. Получили Kafka message
+       2. Проверили есть ли eventId в БД (База гарантирует атомарность)
+       3. Если есть -> ACK и игнор
+       4. Если нет -> сохранить + ACK
   */
   @Transactional
   @KafkaListener(topics = "${app.kafka.topics.task2}", groupId = "${app.kafka.groups.task2}")
-  public void consume(CashbackDto cashbackDto, Acknowledgment ack) {
+  public void consume(
+      @Header(KafkaHeaders.RECEIVED_KEY) String key,
+      @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+      @Header(KafkaHeaders.GROUP_ID) String groupId,
+      CashbackDto cashbackDto,
+      Acknowledgment ack) {
     try {
-      logger.info("consume, processing cashbackDto: {}", cashbackDto);
+      logger.info(
+          "consume, processing, key: {}, topic: {}, group: {} cashbackDto: {}",
+          key,
+          topic,
+          groupId,
+          cashbackDto);
       // 1. Конвертируем DTO в Entity
       Cashback cashback = cashbackMapper.toEntity(cashbackDto);
       // 2. Выполняем бизнес-логику и сохраняем в БД

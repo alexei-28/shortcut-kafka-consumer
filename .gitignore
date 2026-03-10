@@ -37,6 +37,3 @@ out/
 .vscode/
 
 logs
-
-gradlew
-gradlew.bat
