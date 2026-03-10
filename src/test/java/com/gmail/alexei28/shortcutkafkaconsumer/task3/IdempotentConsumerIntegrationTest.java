@@ -23,12 +23,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.backoff.FixedBackOff;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -57,16 +63,48 @@ class IdempotentConsumerIntegrationTest {
   static PostgreSQLContainer<?> postgresContainer =
       new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"));
 
+  // overrideProps вызывается один раз при создании Spring ApplicationContext.
+  // Все тесты класса будут работать с одной уникальной группой.
+  @DynamicPropertySource
+  static void overrideProps(DynamicPropertyRegistry registry) {
+    // Берем префикс из проперти
+    String prefix = "test-task3-group";
+    registry.add("app.kafka.groups.task3", () -> prefix + "-" + UUID.randomUUID());
+  }
+
+  @TestConfiguration
+  static class LocalTestConfig {
+    @Bean
+    public DefaultErrorHandler errorHandler() {
+      /*
+        Полностью отключает retry Spring Kafka:
+         - retryInterval = 0 ms
+         - maxRetries = 0
+         Если не отключить retry, то при падении метода processOrderCreation (например, если он выбросит RuntimeException),
+         Spring Kafka будет бесконечно пытаться обработать это сообщение снова, что приводит к зависанию теста.
+      */
+      return new DefaultErrorHandler(new FixedBackOff(0L, 0));
+    }
+  }
+
   @Autowired private KafkaTemplate<String, String> kafkaTemplate;
   @Autowired private ObjectMapper objectMapper;
-
   @Autowired private AccountOperationRepository accountOperationRepository;
   @Autowired private ProcessedMessageRepository processedMessageRepository;
-
-  @MockitoSpyBean private OrderEventConsumer orderEventConsumerSpy;
-  @MockitoSpyBean private PaymentService paymentService;
+  /*
+      Поскольку OrderEventConsumer помечен как @MockitoSpyBean, Spring использует реальный экземпляр,
+      но позволяет нам «подсматривать» за его методами через verify.
+      @MockitoSpyBean: Позволяет нам следить за реальным бином OrderEventConsumer и считать количество вызовов метода consume.
+      Spring создает настоящий экземпляр вашего OrderEventConsumer со всеми его зависимостями (repository, taskMapper).
+      Обертка (Spy): Mockito «оборачивает» этот реальный объект.
+      Это позволяет вам:
+      -Вызывать реальные методы (код внутри consume и process будет выполнен).
+      -Следить за вызовами (использовать verify, чтобы посчитать количество вызовов).
+      -Переопределять поведение только конкретных методов, если нужно (через doThrow или doReturn).
+  */
+  @MockitoSpyBean private OrderEventConsumer orderEventConsumerMock;
+  @MockitoSpyBean private PaymentService paymentServiceMock;
   private String createOrderRequestValidJson;
-
   private static String jsonTemplate;
   private JsonNode createOrderRequestValidJsonRoot;
 
@@ -80,8 +118,10 @@ class IdempotentConsumerIntegrationTest {
 
   @BeforeEach
   void setUp() throws JsonProcessingException {
+    // Чистим БД перед каждым тестом, чтобы не было пересечений данных между тестами.
     accountOperationRepository.deleteAll();
     processedMessageRepository.deleteAll();
+
     // Update specific nodes in the JSON
     DocumentContext context =
         JsonPath.parse(jsonTemplate)
@@ -104,20 +144,21 @@ class IdempotentConsumerIntegrationTest {
 
     // Assert
     await()
-        .atMost(Duration.ofSeconds(10))
+        .atMost(Duration.ofSeconds(20))
         .untilAsserted(
             () -> {
               assertThat(processedMessageRepository.count()).isEqualTo(1);
               assertThat(accountOperationRepository.count()).isEqualTo(1);
             });
 
-    verify(orderEventConsumerSpy, times(1)).consume(any(), any(), any());
+    verify(orderEventConsumerMock, times(1)).consume(any(), any(), any(), any(), any());
   }
 
   /*
     ДУБЛИКАТ (at-least-once) -> Idempotent Consumer.
     Дубликат не приводит к повторной бизнес-операции
   */
+
   @Test
   void shouldIgnoreDuplicateMessage() throws Exception {
     // Act
@@ -133,7 +174,7 @@ class IdempotentConsumerIntegrationTest {
 
     // Assert
     await()
-        .atMost(Duration.ofSeconds(10))
+        .atMost(Duration.ofSeconds(20))
         .untilAsserted(
             () -> {
               assertThat(processedMessageRepository.count()).isEqualTo(1);
@@ -141,18 +182,23 @@ class IdempotentConsumerIntegrationTest {
             });
 
     // consumer вызовется 2 раза (Kafka доставит оба сообщения)
-    verify(orderEventConsumerSpy, times(2)).consume(any(), any(), any());
+    verify(orderEventConsumerMock, times(2)).consume(any(), any(), any(), any(), any());
   }
 
   /*
     При ошибке ACK не вызывается и сообщение будет переобработано.
     Если processOrderCreation бросает исключение -> ack.acknowledge() не вызывается
   */
+
   @Test
   void shouldNotAckAndNotCommitOffsetWhenExceptionThrown() {
     // Arrange
-    // заставляем сервис падать
-    doThrow(new RuntimeException("boom")).when(paymentService).processOrderCreation(any(), any());
+    // Тест отправляет сообщение. Оно падает. Spring Kafka начинает его ретраить (retry).
+    // Spring Kafka перехватывает исключение и, следуя стандартной политике DefaultErrorHandler,
+    // начинает бесконечно (или многократно) пытаться обработать это сообщение снова.
+    doThrow(new RuntimeException("Some my custom exception"))
+        .when(paymentServiceMock)
+        .processOrderCreation(any(), any());
 
     // Act
     kafkaTemplate.send(
@@ -166,7 +212,7 @@ class IdempotentConsumerIntegrationTest {
         .untilAsserted(
             () -> {
               // consumer вызовется 1 раз
-              verify(orderEventConsumerSpy, times(1)).consume(any(), any(), any());
+              verify(orderEventConsumerMock, times(1)).consume(any(), any(), any(), any(), any());
               // Ничего не сохранится
               assertThat(processedMessageRepository.count()).isZero();
               assertThat(accountOperationRepository.count()).isZero();

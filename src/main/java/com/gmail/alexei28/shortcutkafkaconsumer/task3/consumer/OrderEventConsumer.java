@@ -13,6 +13,16 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 /*
+    Задача 3 — «Перевод через СБП»
+    Сервис обрабатывает межбанковские переводы. Клиент инициировал перевод → списание со счёта → результат в следующий сервис по цепочке.
+
+    Что говорит бизнес:
+    Двойное списание — P1, штраф от регулятора
+    Потеря перевода — P1, клиент без денег
+    Нужен полный аудит каждой операции
+    Стек: PostgreSQL + Kafka
+    Задание: реализуй полный цикл обработки. Ни потеря, ни дубль недопустимы — выбери подход и обоснуй.
+
   - Решение
     Transactional Outbox (at-least-once) + Idempotent Consumer (exactly-once на бизнес-уровне)
     -на стороне producer-a
@@ -48,6 +58,7 @@ import org.springframework.stereotype.Component;
      3. Результат в Kafka: Офсет не зафиксирован. Kafka считает, что сообщение не обработано.
      4. Retry (Повтор): Через некоторое время (или после перезапуска приложения) Kafka снова отдаст
         это же сообщение этому или другому потребителю.
+        По умолчанию Kafka будет продолжать пытаться доставить, пока не получит подтверждение (ack).
      5. Восстановление: Когда БД оживет, сообщение будет обработано успешно, транзакция закоммитится,
         и только тогда вызовется ack.acknowledge().
 
@@ -100,10 +111,17 @@ public class OrderEventConsumer {
   @KafkaListener(topics = "${app.kafka.topics.task3}", groupId = "${app.kafka.groups.task3}")
   public void consume(
       @Header(KafkaHeaders.RECEIVED_KEY) String key,
+      @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+      @Header(KafkaHeaders.GROUP_ID) String groupId,
       ConsumerRecord<String, String> consumerRecord,
       Acknowledgment ack)
       throws Exception {
-    logger.info("consume, key = {}, consumerRecord = {}", key, consumerRecord);
+    logger.info(
+        "consume, key = {}, topic: {}, groupId: {}, consumerRecord: {}",
+        key,
+        topic,
+        groupId,
+        consumerRecord);
     // business logic
     CreateOrderEvent event = mapper.readValue(consumerRecord.value(), CreateOrderEvent.class);
     paymentService.processOrderCreation(event.eventId(), event);
