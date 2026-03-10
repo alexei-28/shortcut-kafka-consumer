@@ -15,7 +15,8 @@ public class Main {
     app.addListeners(new VersionInfoListener());
     app.run(args);
 
-    logger.info("Application started successfully!");
+    logger.info(
+        "\n\n ===== Application started successfully! =====\nЗадача 4 - Битые сообщения из CFT");
     logger.info(
         "Java version: {}, Java vendor: {}",
         System.getProperty("java.version"),

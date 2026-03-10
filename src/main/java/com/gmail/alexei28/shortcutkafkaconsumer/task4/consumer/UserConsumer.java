@@ -53,8 +53,17 @@ public class UserConsumer {
   }
 
   @KafkaListener(topics = "${app.kafka.topics.task4}", groupId = "${app.kafka.groups.task4}")
-  public void consume(@Header(KafkaHeaders.RECEIVED_KEY) String key, UserDto userDto) {
-    logger.info("consume, received message with key(eventId): {}, UserDto: {}", key, userDto);
+  public void consume(
+      @Header(KafkaHeaders.RECEIVED_KEY) String key,
+      @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+      @Header(KafkaHeaders.GROUP_ID) String groupId,
+      UserDto userDto) {
+    logger.info(
+        "consume, received message with key(eventId): {}, topic: {}, groupId: {}, UserDto: {}",
+        key,
+        topic,
+        groupId,
+        userDto);
     userDto.setEventId(UUID.fromString(key));
     userService.saveUser(userDto);
   }
