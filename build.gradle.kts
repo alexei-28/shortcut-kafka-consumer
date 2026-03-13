@@ -26,6 +26,7 @@ repositories {
 
 val mapstructVersion = "1.6.3"
 val equalsverifierVersion = "4.3.1"
+val openApiVersion = "2.6.0"
 
 dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
@@ -37,6 +38,8 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.apache.kafka:kafka-clients")
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
+    // Include Swagger UI
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiVersion")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.kafka:spring-kafka")

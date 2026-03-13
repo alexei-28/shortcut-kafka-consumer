@@ -6,6 +6,8 @@ import com.gmail.alexei28.shortcutkafkaconsumer.task5.entity.DlqMessage;
 import com.gmail.alexei28.shortcutkafkaconsumer.task5.entity.DlqStatus;
 import com.gmail.alexei28.shortcutkafkaconsumer.task5.service.DlqMessageUpdater;
 import com.gmail.alexei28.shortcutkafkaconsumer.task5.service.DlqService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 */
 @RestController
 @RequestMapping("/dlq")
+@Tag(name = "DLQ Controller", description = "Endpoints for retrying and managing DLQ messages")
 public class DlqController {
   private final DlqMessageUpdater dlqMessageUpdater;
   private final DlqService dlqService;
@@ -56,6 +59,7 @@ public class DlqController {
     this.kafkaTemplate = kafkaTemplate;
   }
 
+  @Operation(summary = "List DLQ messages by filters")
   @GetMapping("/list")
   public ResponseEntity<List<DlqMessage>> list(
       @RequestParam(required = false) String topic,
@@ -68,6 +72,7 @@ public class DlqController {
     return ResponseEntity.ok(result);
   }
 
+  @Operation(summary = "Retry a single DLQ message")
   @PostMapping("/retry/{key}")
   public ResponseEntity<String> retry(@PathVariable String key) {
     Optional<DlqMessage> dltMessageOpt = dlqService.getByKey(key);
@@ -90,6 +95,7 @@ public class DlqController {
     return ResponseEntity.ok("Retry triggered for messages, key = " + key);
   }
 
+  @Operation(summary = "Retry multiple DLQ messages by filter")
   @PostMapping("/retry")
   public ResponseEntity<String> retryAll(
       @RequestParam(required = false) String topic,
@@ -103,6 +109,7 @@ public class DlqController {
   }
 
   // Пометить «разобрано, не нужно» (IGNORED)
+  @Operation(summary = "Mark DLQ message as ignored")
   @PostMapping("/ignore/{key}")
   public ResponseEntity<String> ignore(@PathVariable String key) {
     Optional<DlqMessage> dltMessageOpt = dlqService.getByKey(key);

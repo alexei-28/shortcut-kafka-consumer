@@ -3,6 +3,9 @@ server:
   port: 8082
   servlet:
     context-path: /api/v1/
+springdoc:
+  api-docs:
+    path: /openapi # http://localhost:8082/api/v1/openapi
 management:
   # http://localhost:8082/api/v1/actuator/mappings
   endpoints:

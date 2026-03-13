@@ -21,6 +21,9 @@ Mentor platform - Shortcut: https://shortcut.education/
         * JUnit 5
         * Mockito
         * Testcontainers
+    * Doc:
+        * api-docs -  http://localhost:8082/api/v1/openapi
+        * swagger-ui -  http://localhost:8082/api/v1/swagger-ui/index.html
 
 ---
 * **Install application environment**
