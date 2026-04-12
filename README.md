@@ -1,8 +1,7 @@
-# shortcut-kafka-consumer
-Shortcut Kafka consumer test project
+# shortcut-kafka-producer
+Shortcut Kafka producer test project
 
 Producer repo: https://github.com/alexei-28/shortcut-kafka-producer
-
 Consumer repo: https://github.com/alexei-28/shortcut-kafka-consumer
 
 Mentor platform - Shortcut: https://shortcut.education/
@@ -21,15 +20,13 @@ Mentor platform - Shortcut: https://shortcut.education/
         * JUnit 5
         * Mockito
         * Testcontainers
-    * Doc:
-        * api-docs -  http://localhost:8082/api/v1/openapi
-        * swagger-ui -  http://localhost:8082/api/v1/swagger-ui/index.html
 
 ---
 * **Install application environment**
     * docker-compose -f postgresql-docker-compose.yml up -d
+    * docker compose -f kafka-docker-compose.yml up -d
     * Run application: ./gradlew bootRun
-    * Validate is application is up:  http://localhost:8082/api/v1/actuator/health
+    * Validate is application is up: http://localhost:8081/api/v1/actuator/health
 
 ---
 # Kafka — практические задачи

@@ -9,11 +9,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class Main {
-  private static final Logger logger = LoggerFactory.getLogger(Main.class);
+public class Task5 {
+  private static final Logger logger = LoggerFactory.getLogger(Task5.class);
 
   public static void main(String[] args) {
-    SpringApplication app = new SpringApplication(Main.class);
+    SpringApplication app = new SpringApplication(Task5.class);
     app.addListeners(new VersionInfoListener());
     app.run(args);
 
