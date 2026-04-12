@@ -7,11 +7,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Main {
-  private static final Logger logger = LoggerFactory.getLogger(Main.class);
+public class Task3 {
+  private static final Logger logger = LoggerFactory.getLogger(Task3.class);
 
   public static void main(String[] args) {
-    SpringApplication app = new SpringApplication(Main.class);
+    SpringApplication app = new SpringApplication(Task3.class);
     app.addListeners(new VersionInfoListener());
     app.run(args);
     logger.info("\n\n===== Application started successfully!=====\nЗадача 3 — Перевод через СБП");
