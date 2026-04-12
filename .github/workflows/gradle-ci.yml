@@ -5,10 +5,12 @@ on:
     branches:
       - main # Trigger the workflow on pushes to the 'main' branch
       - develop # You can add other branches you want to monitor, e.g., 'develop'
+      - feat/task_1 # Trigger on pushes to 'feat/task_1' branch
   pull_request:
     branches:
       - main
       - develop # Trigger on pull requests targeting 'main' or 'develop'
+      - feat/task_1 # Trigger on pull requests targeting 'feat/task_1'
 
 jobs:
   build-and-test:
