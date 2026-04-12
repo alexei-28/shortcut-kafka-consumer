@@ -7,11 +7,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Main {
-  private static final Logger logger = LoggerFactory.getLogger(Main.class);
+public class Task4 {
+  private static final Logger logger = LoggerFactory.getLogger(Task4.class);
 
   public static void main(String[] args) {
-    SpringApplication app = new SpringApplication(Main.class);
+    SpringApplication app = new SpringApplication(Task4.class);
     app.addListeners(new VersionInfoListener());
     app.run(args);
 
