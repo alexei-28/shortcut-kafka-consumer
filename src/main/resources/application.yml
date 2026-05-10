@@ -67,7 +67,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-        spring.json.value.default.type: "com.gmail.alexei28.shortcutkafkaconsumer.task4.dto.UserDto"
+        spring.json.value.default.type: "com.gmail.alexei28.shortcut.kafka.consumer.task4.dto.UserDto"
         spring.json.trusted.packages: "*"
         spring.json.remove.type.headers: false
 logging.level:
