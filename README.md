@@ -13,20 +13,20 @@ Mentor platform - Shortcut: https://shortcut.education/
     * Gradle: 8.14
     * Spring Boot: 3.5.7
     * Docker
-        * Create 1 Kafka broker and kafka-ui by kafka-docker-compose.yml
-        * Create PostgreSQL database by postgres-docker-compose.yml
-    *  Kafka UI - https://github.com/provectus/kafka-ui
-        * Address http://localhost:8080/
+      * Create 1 Kafka broker and kafka-ui by kafka-docker-compose.yml
+      * Create PostgreSQL database by postgres-docker-compose.yml
+  *  Kafka UI - https://github.com/provectus/kafka-ui
+      * Address http://localhost:8080/
     * Test tools:
-        * JUnit 5
-        * Mockito
-        * Testcontainers
+      * JUnit 5
+      * Mockito
+      * Testcontainers
 
 ---
 * **Install application environment**
-    * docker-compose -f postgresql-docker-compose.yml up -d
-    * Run application: ./gradlew bootRun
-    * Validate is application is up:  http://localhost:8082/api/v1/actuator/health
+  * docker-compose -f postgresql-docker-compose.yml up -d
+  * Run application: ./gradlew bootRun
+  * Validate is application is up:  http://localhost:8082/api/v1/actuator/health
 
 ---
 # Kafka — практические задачи

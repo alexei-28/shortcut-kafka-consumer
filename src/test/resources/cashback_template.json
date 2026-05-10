@@ -1,0 +1,11 @@
+{
+  "eventId": "8b29ac33-33f8-4d6b-8a73-66af7b61c21b",
+  "userId": 123,
+  "orderId": "ORD-xxx",
+  "amount": 150.50,
+  "percentage": 0.05,
+  "status": "xxx",
+  "createdAt": "xxx",
+  "appliedAt": "xxx",
+  "receivedAt": "xxx"
+}
