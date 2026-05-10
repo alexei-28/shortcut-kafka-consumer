@@ -1,9 +1,9 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task1.consumer;
+package com.gmail.alexei28.shortcut.kafka.consumer.task1.consumer;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.task1.dto.Task1Dto;
-import com.gmail.alexei28.shortcutkafkaconsumer.task1.entity.Task1;
-import com.gmail.alexei28.shortcutkafkaconsumer.task1.interfaces.TaskMapper;
-import com.gmail.alexei28.shortcutkafkaconsumer.task1.repo.Task1Repository;
+import com.gmail.alexei28.shortcut.kafka.consumer.task1.dto.Task1Dto;
+import com.gmail.alexei28.shortcut.kafka.consumer.task1.entity.Task1;
+import com.gmail.alexei28.shortcut.kafka.consumer.task1.interfaces.TaskMapper;
+import com.gmail.alexei28.shortcut.kafka.consumer.task1.repo.Task1Repository;
 import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

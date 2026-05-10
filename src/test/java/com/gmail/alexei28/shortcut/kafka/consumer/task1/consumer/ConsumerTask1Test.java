@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task1.consumer;
+package com.gmail.alexei28.shortcut.kafka.consumer.task1.consumer;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
@@ -7,8 +7,8 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gmail.alexei28.shortcutkafkaconsumer.task1.dto.Task1Dto;
-import com.gmail.alexei28.shortcutkafkaconsumer.task1.repo.Task1Repository;
+import com.gmail.alexei28.shortcut.kafka.consumer.task1.dto.Task1Dto;
+import com.gmail.alexei28.shortcut.kafka.consumer.task1.repo.Task1Repository;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.io.IOException;

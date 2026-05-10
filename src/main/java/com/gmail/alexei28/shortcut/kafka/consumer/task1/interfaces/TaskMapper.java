@@ -1,7 +1,7 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task1.interfaces;
+package com.gmail.alexei28.shortcut.kafka.consumer.task1.interfaces;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.task1.dto.Task1Dto;
-import com.gmail.alexei28.shortcutkafkaconsumer.task1.entity.Task1;
+import com.gmail.alexei28.shortcut.kafka.consumer.task1.dto.Task1Dto;
+import com.gmail.alexei28.shortcut.kafka.consumer.task1.entity.Task1;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring") // Чтобы маппер стал Spring-бином
