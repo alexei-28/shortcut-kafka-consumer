@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.configuration;
+package com.gmail.alexei28.shortcut.kafka.consumer.configuration;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
