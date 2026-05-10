@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.configuration;
+package com.gmail.alexei28.shortcut.kafka.consumer.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;

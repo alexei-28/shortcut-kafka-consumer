@@ -1,9 +1,9 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task2.consumer;
+package com.gmail.alexei28.shortcut.kafka.consumer.task2.consumer;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.dto.CashbackDto;
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.entity.Cashback;
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.interfaces.CashbackMapper;
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.repo.CashbackRepository;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.dto.CashbackDto;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.entity.Cashback;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.interfaces.CashbackMapper;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.repo.CashbackRepository;
 import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

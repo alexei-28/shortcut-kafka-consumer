@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task2.consumer;
+package com.gmail.alexei28.shortcut.kafka.consumer.task2.consumer;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,10 +8,10 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.dto.CashbackDto;
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.entity.Cashback;
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.entity.CashbackStatus;
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.repo.CashbackRepository;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.dto.CashbackDto;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.entity.Cashback;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.entity.CashbackStatus;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.repo.CashbackRepository;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.io.IOException;

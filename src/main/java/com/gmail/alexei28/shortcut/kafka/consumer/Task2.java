@@ -1,6 +1,6 @@
-package com.gmail.alexei28.shortcutkafkaconsumer;
+package com.gmail.alexei28.shortcut.kafka.consumer;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.configuration.VersionInfoListener;
+import com.gmail.alexei28.shortcut.kafka.consumer.configuration.VersionInfoListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

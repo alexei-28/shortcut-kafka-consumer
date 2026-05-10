@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task2.dto;
+package com.gmail.alexei28.shortcut.kafka.consumer.task2.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

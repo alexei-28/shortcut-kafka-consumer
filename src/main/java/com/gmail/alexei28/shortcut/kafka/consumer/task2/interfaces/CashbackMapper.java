@@ -1,7 +1,7 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task2.interfaces;
+package com.gmail.alexei28.shortcut.kafka.consumer.task2.interfaces;
 
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.dto.CashbackDto;
-import com.gmail.alexei28.shortcutkafkaconsumer.task2.entity.Cashback;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.dto.CashbackDto;
+import com.gmail.alexei28.shortcut.kafka.consumer.task2.entity.Cashback;
 import org.mapstruct.Mapper;
 
 // Чтобы маппер стал Spring-бином

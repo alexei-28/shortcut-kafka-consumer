@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task2.entity;
+package com.gmail.alexei28.shortcut.kafka.consumer.task2.entity;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;

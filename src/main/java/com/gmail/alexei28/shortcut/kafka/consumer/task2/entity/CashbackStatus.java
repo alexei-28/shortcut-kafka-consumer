@@ -1,4 +1,4 @@
-package com.gmail.alexei28.shortcutkafkaconsumer.task2.entity;
+package com.gmail.alexei28.shortcut.kafka.consumer.task2.entity;
 
 public enum CashbackStatus {
   PENDING, // Ожидает подтверждения (например, 14 дней на возврат товара)
