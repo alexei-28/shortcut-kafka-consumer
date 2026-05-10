@@ -6,9 +6,9 @@ server:
 app:
   kafka:
     topics:
-      task1: task1-topic
+      task3: task3-topic
     groups:
-      task1: task1-group
+      task3: task3-group
 spring:
   application:
     name: shortcut-kafka-consumer
@@ -52,18 +52,24 @@ spring:
       group-id: dev-group
       # Эквивалент ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
       auto-offset-reset: earliest
+      # Обязательно для контроля обработки. Если приложение упадет до записи в БД, сообщение перечитается.
+      enable-auto-commit: false
       # 1. Указываем ErrorHandlingDeserializer как основной класс
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
+        # Читать только подтвержденные транзакции продюсера.
+        isolation.level: read_committed
+        # Дать 5 минут на обработку пачки (защита от ребалансировки)
+        max.poll.interval.ms: 300000
         # Запрещаем удалять заголовки типов после десериализации
         spring.json.remove.type.headers: false
-        spring.json.type.mapping: "com.gmail.alexei28.shortcutkafkaproducer.dto.Task1Dto:com.gmail.alexei28.shortcutkafkaconsumer.dto.Task1Dto"
         # 2. Указываем делегатов, которые будут выполнять реальную работу
         spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
         spring.json.trusted.packages: "*" # Доверяем всем пакетам для десериализации
     listener:
+      # Позволяет подтверждать сообщение сразу после успешного коммита в БД.
       ack-mode: MANUAL_IMMEDIATE
 logging.level:
   org.springframework.kafka: info
