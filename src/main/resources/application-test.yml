@@ -2,7 +2,12 @@
 app:
   kafka:
     topics:
-      task1: test-task1-topic
+      task5: test-task5-topic
+    groups:
+      task5: test-task5-group # @DynamicPropertySource будет его переопределять на уникальный UUID
+    retry:
+      # Максимальное количество попыток для транзиентных(временных) ошибок - недоступна Kafka,сеть,БД и т.д.
+      max-attempts: 3
 spring:
   jpa:
     hibernate:
@@ -21,6 +26,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
+      # Гарантирует, что при запуске теста с новой группой консьюмер начнёт читать с самого начала, а не будет ждать новых сообщений
+      auto-offset-reset: earliest
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer

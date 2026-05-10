@@ -8,28 +8,28 @@ import org.springframework.kafka.listener.RecordInterceptor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KafkaLoggingConsumerListener implements RecordInterceptor<Object, Object> {
+public class KafkaLoggingConsumerListener<K, V> implements RecordInterceptor<K, V> {
+
   private static final Logger logger = LoggerFactory.getLogger(KafkaLoggingConsumerListener.class);
 
   @Override
-  public ConsumerRecord<Object, Object> intercept(
-      ConsumerRecord<Object, Object> consumerRecord, Consumer<Object, Object> consumer) {
-    // Ищем заголовок __TypeId__ среди всех заголовков записи
-    consumerRecord
+  public ConsumerRecord<K, V> intercept(ConsumerRecord<K, V> record, Consumer<K, V> consumer) {
+
+    record
         .headers()
         .headers("__TypeId__")
         .forEach(
             header -> {
               String typeId = new String(header.value());
               logger.info(
-                  "intercept, Topic: {} , __TypeId__: {}, partition: {}, key: {}, value: {}",
-                  consumerRecord.topic(),
+                  "intercept, Topic: {}, __TypeId__: {}, partition: {}, key: {}, value: {}",
+                  record.topic(),
                   typeId,
-                  consumerRecord.partition(),
-                  consumerRecord.key(),
-                  consumerRecord.value());
+                  record.partition(),
+                  record.key(),
+                  record.value());
             });
 
-    return consumerRecord; // Возвращаем запись для дальнейшей обработки в @KafkaListener
+    return record;
   }
 }
